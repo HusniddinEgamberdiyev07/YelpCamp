@@ -2,25 +2,49 @@
 <div class="container">
     <h1 class="text-center mb-5">New campground</h1>
 
-    <form action="/campgrounds" method="POST" class="col-6 offset-3">
-        <label for="title" class="form-label">Title</label>
-        <input type="text" id="title" name="campground[title]" class="form-control mb-4">
+    <form action="/campgrounds" method="POST" class="row col-6 offset-3 validated-form" novalidate>
+        <div>
+            <label for="title" class="form-label">Title</label>
+            <input type="text" id="title" name="campground[title]" class="form-control mb-4" required>
 
-        <label for="location" class="form-label">Location</label>
-        <input type="text" id="location" name="campground[location]" class="form-control mb-4">
+            <div class="invalid-feedback">
+                Please enter a title.
+            </div>
+        </div>
+
+        <div>
+            <label for="location" class="form-label">Location</label>
+            <input type="text" id="location" name="campground[location]" class="form-control mb-4" required>
+            <div class="invalid-feedback">
+                Please enter a location.
+            </div>
+        </div>
 
         <label for="price" class="form-label">Price</label>
         <div class="input-group mb-4">
             <span class="input-group-text" id="priceAddon">$</span>
-            <input type="text" class="form-control" placeholder="0.00" name="campground[price]" id="price" aria-describedby="priceAddon">
+            <input type="text" class="form-control" placeholder="0.00" name="campground[price]" id="price" aria-describedby="priceAddon" required>
+            <div class="invalid-feedback">
+                Please enter a price.
+            </div>
         </div>
 
-        <label for="image" class="form-label">Image Url</label>
-        <input type="text" id="image" name="campground[image]" class="form-control mb-4">
+        <div>
+            <label for="image" class="form-label">Image Url</label>
+            <input type="text" id="image" name="campground[image]" class="form-control mb-4" required>
+            <div class="invalid-feedback">
+                Please upload an image.
+            </div>
+        </div>
 
-        <label for="description" class="form-label">Description</label>
-        <textarea class="form-control mb-4" id="description" name="campground[description]" rows="3"></textarea>
-
+        <div>
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control mb-4" id="description" name="campground[description]" rows="3" required></textarea>
+            <div class="invalid-feedback">
+                Please enter a description.
+            </div>
+        </div>
+        
         <button type="submit" class="btn btn-success">Add a campground</button>
     </form>
 </div>

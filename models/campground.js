@@ -9,4 +9,10 @@ const CampgroundSchema = new Schema({
     image:String
 })
 
+const studentsSchema = new Schema({
+    name:String,
+    level:String,
+    
+})
+
 module.exports = mongoose.model("Campground", CampgroundSchema);
