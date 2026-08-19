@@ -4,6 +4,7 @@ const CampgroundModel = require("./models/campground")
 const path = require("path");
 const method_override = require("method-override")
 const engine = require("ejs-mate");
+const ExpressError = require("./utils/ExpressError");
 
 const app = express();
 
@@ -71,6 +72,20 @@ app.delete("/campgrounds/:id", async (req, res)=>{
     res.redirect("/campgrounds");
 })
 
+// app.all('/{*path}', (req, res, next)=>{
+//     throw new ExpressError("Page not found", 404);
+// })
+
+app.use((req, res, next)=>{
+    throw new ExpressError("Page not found", 404);
+})
+
+app.use((err, req, res, next)=>{
+    const {statusCode = 500} = err;
+    if (!err.message) err.message = "Soemthing went wrong";
+    // res.status(statusCode).send(message);
+    res.status(statusCode).render("error", {err})
+})
 
 app.listen(3000, ()=>{
     console.log("Listening on port: 3000");
