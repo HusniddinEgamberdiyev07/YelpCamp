@@ -5,6 +5,7 @@ const path = require("path");
 const method_override = require("method-override")
 const engine = require("ejs-mate");
 const ExpressError = require("./utils/ExpressError");
+const {campgroundsSchema} = require("./schemas");
 
 const app = express();
 
@@ -19,6 +20,17 @@ app.set("views", path.join(__dirname, "views"))
 
 app.use(express.urlencoded({extended:true}))
 app.use(method_override('_method'))
+
+const validateCampground = (req, res, next) =>{
+    const {error} = campgroundsSchema.validate(req.body)
+    
+    if (error) {
+        const msg = error.details.map(el=>el.message).join(",");    
+        throw new ExpressError(msg, 400)
+    } 
+    
+    next() 
+}
 
 
 app.get("/", async (req, res)=>{
@@ -35,7 +47,7 @@ app.get("/campgrounds/new", (req, res)=>{
     res.render("./campgrounds/new")
 })
 
-app.post("/campgrounds", async (req, res)=>{
+app.post("/campgrounds", validateCampground, async (req, res)=>{    
     const camp = new CampgroundModel(req.body.campground);
     await camp.save();
 
@@ -45,23 +57,28 @@ app.post("/campgrounds", async (req, res)=>{
 app.get("/campgrounds/:id", async (req, res)=>{
     const {id} = req.params;
     const camp = await CampgroundModel.findById(id);
-    console.log(camp);
-    
+
+    if(!camp) throw new ExpressError("Campground is not found", 404);
     
     res.render("./campgrounds/show", {camp});
 })
 
-app.get("/campgrounds/:id/edit", async (req, res)=>{
-    console.log(req.params.id);
-    
+app.get("/campgrounds/:id/edit", async (req, res)=>{    
     const camp = await CampgroundModel.findById(req.params.id);
+
+    if (!camp) throw new ExpressError("Could not find a campground", 404); 
 
     res.render("./campgrounds/edit", {camp})
 })
 
-app.put("/campgrounds/:id", async (req, res)=>{
+app.put("/campgrounds/:id", validateCampground, async (req, res)=>{
     const {id} = req.params;
-    const camp = await CampgroundModel.findByIdAndUpdate(id, req.body.campground);
+    const camp = await CampgroundModel.findByIdAndUpdate(id, req.body.campground, { 
+        new: true,
+        runValidators: true
+    });
+
+    if(!camp) throw new ExpressError("Campground is not found", 404);
 
     res.redirect(`/campgrounds/${camp._id}`)
 })
@@ -82,7 +99,7 @@ app.use((req, res, next)=>{
 
 app.use((err, req, res, next)=>{
     const {statusCode = 500} = err;
-    if (!err.message) err.message = "Soemthing went wrong";
+    // if (!err.message) err.message = "Soemthing went wrong";
     // res.status(statusCode).send(message);
     res.status(statusCode).render("error", {err})
 })
